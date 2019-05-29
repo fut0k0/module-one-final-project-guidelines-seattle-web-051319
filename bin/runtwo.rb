@@ -8,6 +8,11 @@ class CLI
   def initialize(user=nil)
     @user = user
   end
+  #User Methods
+  #_____________
+  #Get a User
+  #Recognize a User
+  #Call a User
 
   def welcome
       puts "Welcome to the Lyric Builder App!!!"
@@ -21,6 +26,7 @@ class CLI
         binding.pry
         user = User.find_by(name: login_input)
         puts "Hello #{user.name}!"
+        @user = user
         return user
       elsif input == 'n'
         print "Enter your name: "
