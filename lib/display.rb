@@ -1,4 +1,4 @@
-def display
+def display(user)
   islooped = true
   choice = nil
   while islooped
@@ -15,7 +15,7 @@ def display
     case choice
       when 1
         puts "Searching"
-        search
+        search(user)
       when 2
         #TODO
         #Access database

@@ -7,13 +7,16 @@ def welcome
     if input == 'y'
       print "Login name: "
       login_input = gets.chomp
-      returning_user = User.find_by(name: login_input)
-      puts "Hello #{returning_user.name}!"
+      binding.pry
+      user = User.find_by(name: login_input)
+      puts "Hello #{user.name}!"
+      return user
     elsif input == 'n'
       print "Enter your name: "
       name_input = gets.chomp
       #binding.pry
-      User.create(name: name_input)
+      user = User.create(name: name_input)
+      return user
     end
-    display
+
 end

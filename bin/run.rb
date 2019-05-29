@@ -2,6 +2,10 @@ require_relative '../config/environment'
 require "pry"
 require "rest_client"
 require "JSON"
-welcome
+
+
+user = welcome
+binding.pry
+display(user)
 
 puts "HELLO WORLD"

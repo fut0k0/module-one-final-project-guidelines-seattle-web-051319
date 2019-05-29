@@ -3,7 +3,7 @@ require "rest_client"
 require "JSON"
 require "timeout"
 
-def search
+def search(user)
 	stillsearching = true
 		while stillsearching
 			print "Enter Artist: "
@@ -33,10 +33,11 @@ def search
 		print "Would you like to save this song lyrics? y/n: "
 		answer = gets.strip
 			if answer == "y"
-				Song.create(artist: artist_input, title: song_input , lyrics: text_lyrics)
+				new_song = Song.create(artist: artist_input, title: song_input , lyrics: text_lyrics)
+				binding.pry
 			elsif answer == "n"
 				display
 			end
-			binding.pry
-			0
+			# binding.pry
+			# 0
 end

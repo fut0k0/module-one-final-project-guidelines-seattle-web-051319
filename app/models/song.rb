@@ -1,4 +1,4 @@
 class Song < ActiveRecord::Base
-  belongs_to :users
-  has_many :snippets, through: :users
+  belongs_to :user
+  has_many :snippets, through: :user
 end
