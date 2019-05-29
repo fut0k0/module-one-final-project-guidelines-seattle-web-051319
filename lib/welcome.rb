@@ -17,15 +17,3 @@ def welcome
     end
     display
 end
-
-
-
-
-# If No user Exists in database
-# 	Hello New User
-#
-# 	Enter you name:
-# Else
-# 	Returning user?
-# 	Enter your name:
-# End

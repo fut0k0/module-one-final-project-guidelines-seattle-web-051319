@@ -15,7 +15,7 @@ def search
 
 			song_result = nil
 			begin
-			status = Timeout::timeout(8){
+			status = Timeout::timeout(10){
 				song_result = RestClient.get("https://api.lyrics.ovh/v1/#{artist_input}/#{song_input}")
 			}
 			stillsearching = false
