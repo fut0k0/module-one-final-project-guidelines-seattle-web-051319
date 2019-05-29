@@ -89,6 +89,7 @@ class CLI
             #Pull Song Titles, reformat, and list them
             #Allow to delete song or clear history
             puts "Historying"
+            history
           when 3
             #TODO
             #Submenu
@@ -130,7 +131,7 @@ class CLI
     		end
     		lyrics = JSON.parse(song_result)
     		text_lyrics = lyrics["lyrics"]
-    		#binding.pry
+
     		organized_lyrics = lyrics["lyrics"].split("\n")
 
     		organized_lyrics.each_with_index {|line, i| puts "[#{i+1}] #{line}"}
@@ -139,19 +140,47 @@ class CLI
     		answer = STDIN.gets.strip
     			if answer == "y"
     				new_song = Song.create(artist: artist_input, title: song_input , lyrics: text_lyrics)
-            binding.pry
+
             @user.user.songs << new_song
             puts "Song added."
-    				binding.pry
-    			# elsif answer == "n"
-    			# 	display
     			end
-    			# binding.pry
-    			# 0
+
+        end
+        #TODO
+        #Access database
+        #Pull Song Titles, reformat, and list them
+        #Allow to delete song or clear history
+        def history
+          listofsongs = @user.user.songs
+          listofsongs.each_with_index {|song, i|
+            puts "[#{i+1}] Artist: #{song.artist} - Title: #{song.title}"
+
+          }
+          history_menu
+
         end
 
+        def history_menu
+          puts "1. Remove Song"
+          puts "2. Clear Songs"
+          puts "3. Main Menu"
+          print "Enter choice: "
+          input = STDIN.gets.chomp.to_i
+          case input
+            when 1
+              print "Choose line number to remove: "
+              removing = STDIN.gets.chomp.to_i
+              songtodelete = @user.user.songs[removing-1].id
+              @user.user.songs.destroy(songtodelete)
+              puts "Deleting song. . ."
+              #binding.pry
+            when 2
+              print "DESTROYING ALL SONGS!!!"
+              @user.user.songs.destroy_all
+            when 3
 
-
+          end
+        end
   end
 
 
