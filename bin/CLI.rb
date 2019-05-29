@@ -1,8 +1,3 @@
-require_relative '../config/environment'
-require "pry"
-require "rest_client"
-require "JSON"
-
 class CLI
   attr_accessor :user
   def initialize(user=nil)
@@ -44,7 +39,7 @@ class CLI
       puts "Hello #{user.name}!"
       returninguser = CLI.new(user)
       @user = returninguser
-      binding.pry
+      #binding.pry
       returninguser
     end
 
@@ -66,24 +61,28 @@ class CLI
       newuser
     end
 
+    def menu
+      puts "#{@user.user.name}'s Main Menu"
+      puts "----------"
+      puts "1. Search"
+      puts "2. History"
+      puts "3. Snippet"
+      puts "4. Quit"
+      puts "----------"
+      print "Enter Number: "
+    end
+
     def display
       islooped = true
       choice = nil
       while islooped
-        puts "Main Menu"
-        puts "----------"
-        puts "1. Search"
-        puts "2. History"
-        puts "3. Snippet"
-        puts "4. Quit"
-        puts "----------"
-        print "Enter Number: "
+        menu
         choice = STDIN.gets.chomp.to_i
 
         case choice
           when 1
             puts "Searching"
-            #search
+            search
           when 2
             #TODO
             #Access database
@@ -108,6 +107,49 @@ class CLI
         end
       end
     end
+
+    def search
+    	stillsearching = true
+    		while stillsearching
+    			print "Enter Artist: "
+    			artist_input = STDIN.gets.strip.downcase
+    			artist_input = artist_input.gsub(" ", "%20")
+    			print "Enter Song Title: "
+    			song_input = STDIN.gets.strip.downcase
+    			song_input = song_input.gsub(" ", "%20")
+
+    			song_result = nil
+    			begin
+    			status = Timeout::timeout(10){
+    				song_result = RestClient.get("https://api.lyrics.ovh/v1/#{artist_input}/#{song_input}")
+    			}
+    			stillsearching = false
+    			rescue Timeout::Error
+    				puts "Took too long. . ."
+    			end
+    		end
+    		lyrics = JSON.parse(song_result)
+    		text_lyrics = lyrics["lyrics"]
+    		#binding.pry
+    		organized_lyrics = lyrics["lyrics"].split("\n")
+
+    		organized_lyrics.each_with_index {|line, i| puts "[#{i+1}] #{line}"}
+
+    		print "Would you like to save this song lyrics? y/n: "
+    		answer = STDIN.gets.strip
+    			if answer == "y"
+    				new_song = Song.create(artist: artist_input, title: song_input , lyrics: text_lyrics)
+            binding.pry
+            @user.user.songs << new_song
+            puts "Song added."
+    				binding.pry
+    			# elsif answer == "n"
+    			# 	display
+    			end
+    			# binding.pry
+    			# 0
+        end
+
 
 
   end
