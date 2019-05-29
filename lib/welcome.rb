@@ -15,8 +15,9 @@ def welcome
       #binding.pry
       User.create(name: name_input)
     end
-
+    display
 end
+
 
 
 
