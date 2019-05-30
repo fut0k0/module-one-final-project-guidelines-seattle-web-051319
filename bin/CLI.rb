@@ -133,6 +133,7 @@ class CLI
     if saved_songs.size == 0
       puts "History is empty!"
       puts " "
+      return
     end
     saved_songs_menu
   end
