@@ -1,7 +1,7 @@
 require "pry"
-require "rest_client"
-require "JSON"
-require "timeout"
+#require "rest_client"
+# require "JSON"
+#require "timeout"
 
 def search(user)
 	stillsearching = true

@@ -1,187 +1,165 @@
 class CLI
-  attr_accessor :user
+  attr_reader :user
+  
   def initialize(user=nil)
     @user = user
-    @created = "Created!!!"
   end
 
   def run
-      puts "Welcome to the Lyric Builder App!!!"
+    puts "Welcome to the Lyric Builder App!!!"
+		puts " "
+    print "Are you a returning user? (y/n): "
+    user_input
+    display
+    binding.pry
 
-      puts "Are you a Returning user? y/n"
-      user_input
-      display
-      binding.pry
-
-  end
-
-  def get_user
-    @user
   end
 
   def user_input
-    #binding.pry
-    input = STDIN.gets.chomp
+    input = STDIN.gets.chomp.downcase
 
-    #binding.pry
-    if input == 'y'
+    if input == "y"
       returning_user
-    elsif input == 'n'
+    else input == "n"
       new_user
     end
   end
 
-
-    def returning_user
-      print "Login name: "
-      login_input = STDIN.gets.chomp
-      user = User.find_by(name: login_input)
-      puts "Hello #{user.name}!"
-      returninguser = CLI.new(user)
-      @user = returninguser
-      #binding.pry
-      returninguser
-    end
-
-    def new_user
-      nameloop = true
-      while nameloop
-      print "Enter your name: "
-      name_input = STDIN.gets.chomp
-        if User.find_by(name: name_input)
-          puts "#{name_input} is already taken."
-          puts "Please try a new name."
-        else
-          user = User.create(name: name_input)
-          newuser = CLI.new(user)
-          @user = newuser
-          nameloop = false
-        end
-      end
-      newuser
-    end
-
-    def menu
-      puts "#{@user.user.name}'s Main Menu"
-      puts "----------"
-      puts "1. Search"
-      puts "2. History"
-      puts "3. Snippet"
-      puts "4. Quit"
-      puts "----------"
-      print "Enter Number: "
-    end
-
-    def display
-      islooped = true
-      choice = nil
-      while islooped
-        menu
-        choice = STDIN.gets.chomp.to_i
-
-        case choice
-          when 1
-            puts "Searching"
-            search
-          when 2
-            #TODO
-            #Access database
-            #Pull Song Titles, reformat, and list them
-            #Allow to delete song or clear history
-            puts "Historying"
-            history
-          when 3
-            #TODO
-            #Submenu
-            #-View Snippet
-              #Display all snippets
-            #-Create Snippet
-              #Choose song from the SOng History list
-              #User input = Choose Line number
-            #-Delete Snippet
-              #User input = Choose Line Number
-            #-Quit
-            puts "Snippeting"
-
-          when 4
-            islooped = false
-        end
-      end
-    end
-
-    def search
-    	stillsearching = true
-    		while stillsearching
-    			print "Enter Artist: "
-    			artist_input = STDIN.gets.strip.downcase
-    			artist_input = artist_input.gsub(" ", "%20")
-    			print "Enter Song Title: "
-    			song_input = STDIN.gets.strip.downcase
-    			song_input = song_input.gsub(" ", "%20")
-
-    			song_result = nil
-    			begin
-    			status = Timeout::timeout(10){
-    				song_result = RestClient.get("https://api.lyrics.ovh/v1/#{artist_input}/#{song_input}")
-    			}
-    			stillsearching = false
-    			rescue Timeout::Error
-    				puts "Took too long. . ."
-    			end
-    		end
-    		lyrics = JSON.parse(song_result)
-    		text_lyrics = lyrics["lyrics"]
-
-    		organized_lyrics = lyrics["lyrics"].split("\n")
-
-    		organized_lyrics.each_with_index {|line, i| puts "[#{i+1}] #{line}"}
-
-    		print "Would you like to save this song lyrics? y/n: "
-    		answer = STDIN.gets.strip
-    			if answer == "y"
-    				new_song = Song.create(artist: artist_input, title: song_input , lyrics: text_lyrics)
-
-            @user.user.songs << new_song
-            puts "Song added."
-    			end
-
-        end
-        #TODO
-        #Access database
-        #Pull Song Titles, reformat, and list them
-        #Allow to delete song or clear history
-        def history
-          listofsongs = @user.user.songs
-          listofsongs.each_with_index {|song, i|
-            puts "[#{i+1}] Artist: #{song.artist} - Title: #{song.title}"
-
-          }
-          history_menu
-
-        end
-
-        def history_menu
-          puts "1. Remove Song"
-          puts "2. Clear Songs"
-          puts "3. Main Menu"
-          print "Enter choice: "
-          input = STDIN.gets.chomp.to_i
-          case input
-            when 1
-              print "Choose line number to remove: "
-              removing = STDIN.gets.chomp.to_i
-              songtodelete = @user.user.songs[removing-1].id
-              @user.user.songs.destroy(songtodelete)
-              puts "Deleting song. . ."
-              #binding.pry
-            when 2
-              print "DESTROYING ALL SONGS!!!"
-              @user.user.songs.destroy_all
-            when 3
-
-          end
-        end
+  def returning_user
+    puts " "
+    print "Enter user name: "
+    input = STDIN.gets.chomp
+    @user = User.find_by(name: input)
+    puts " "
+    puts "Hello #{@user.name}!"
   end
 
+  def new_user
+    loop_control = true
+    
+    while loop_control
+	    puts " "  
+      print "Enter your name: "
+      input = STDIN.gets.chomp
+      if User.find_by(name: input)
+        puts " "
+        puts "#{input} is already in use."
+        puts "Please use a different name."
+      else
+        @user = User.create(name: input)
+        #newuser = CLI.new(user)
+        #@user = newuser
+        puts " "
+        puts "Welcome, #{@user.name}!"
+        loop_control = false
+      end
+    end
+  end
 
-  #User Methods
+  def main_menu
+    puts " "
+    puts "Main Menu"
+    puts "---------"
+    puts "1. Search for lyrics"
+    puts "2. Access saved songs"
+    puts "3. Work with snippets"
+    puts "4. Quit"
+    puts " "
+    print "Enter choice: "
+  end
+
+  def display
+    choice = nil
+    loop_control = true
+    
+    while loop_control
+      main_menu
+      input = STDIN.gets.chomp.to_i
+
+      case input
+        when 1
+          search
+        when 2
+          history
+        when 3
+          puts "Snippeting"
+        when 4
+          loop_control = false
+      end
+    end
+  end
+
+  def search
+  	loop_control = true
+  	
+		while loop_control
+			puts " "
+			print "Enter artist: "
+			artist = STDIN.gets.strip.downcase
+			artist = artist.gsub(" ", "%20")
+			print "Enter song title: "
+			song = STDIN.gets.strip.downcase
+			song = song.gsub(" ", "%20")
+
+			search_result = nil
+			begin
+				status = Timeout::timeout(10){
+					search_result = RestClient.get("https://api.lyrics.ovh/v1/#{artist}/#{song}")}
+				loop_control = false
+			rescue Timeout::Error
+				puts "Taking too long..."
+			end
+		end
+		
+		lyrics = JSON.parse(search_result)
+		lyrics_text = lyrics["lyrics"]
+		lyrics_formatted = lyrics_text.split("\n")
+		lyrics_formatted.each_with_index {|line, i| puts "[#{i+1}] #{line}"}
+
+		print "Would you like to save this song? (y/n): "
+		answer = STDIN.gets.strip.downcase
+		if answer == "y"
+			new_song = Song.create(artist: artist, title: song, lyrics: lyrics_text)
+      @user.songs << new_song
+      puts "Added to saved songs."
+		end
+  end
+  
+  def history
+    saved_songs = @user.songs
+    saved_songs.each_with_index {|song, i|
+    puts "[#{i+1}] #{song.title.gsub("%20", " ").titleize} by #{song.artist.gsub("%20", " ").titleize}"}
+    puts " "
+    if saved_songs.size == 0
+      puts "History is empty!"
+      puts " "
+    end
+    history_menu
+
+  end
+
+  def history_menu
+    puts "1. Remove song"
+    puts "2. Clear all songs"
+    puts "3. Back to Main Menu"
+    puts " "
+    print "Enter choice: "
+    input = STDIN.gets.chomp.to_i
+    case input
+      when 1
+      	puts " "
+        print "Choose song to remove: "
+        song = STDIN.gets.chomp.to_i
+        song_id = @user.songs[song - 1].id
+        @user.songs.destroy(song_id)
+        puts " "
+        puts "Removed from saved songs."
+      when 2
+      	puts " "
+        print "All songs removed from saved songs."
+        puts " "
+        @user.songs.destroy_all
+      when 3
+    end
+  end
+end
