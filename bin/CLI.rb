@@ -1,6 +1,6 @@
 class CLI
   attr_reader :user
-  
+
   def initialize(user=nil)
     @user = user
   end
@@ -35,9 +35,9 @@ class CLI
 
   def new_user
     loop_control = true
-    
+
     while loop_control
-	    puts " "  
+	    puts " "
       print "Enter your name: "
       input = STDIN.gets.chomp
       if User.find_by(name: input)
@@ -70,7 +70,7 @@ class CLI
   def main_menu
     choice = nil
     loop_control = true
-    
+
     while loop_control
       main_menu_print
       input = STDIN.gets.chomp.to_i
@@ -90,7 +90,7 @@ class CLI
 
   def search
   	loop_control = true
-  	
+
 		while loop_control
 			puts " "
 			print "Enter artist: "
@@ -109,7 +109,7 @@ class CLI
 				puts "Taking too long..."
 			end
 		end
-		
+
 		lyrics = JSON.parse(search_result)
 		lyrics_text = lyrics["lyrics"]
 		lyrics_formatted = lyrics_text.split("\n")
@@ -124,7 +124,7 @@ class CLI
       puts "Added to saved songs."
 		end
   end
-  
+
   def saved_songs
     saved_songs = @user.songs
     saved_songs.each_with_index {|song, i|
