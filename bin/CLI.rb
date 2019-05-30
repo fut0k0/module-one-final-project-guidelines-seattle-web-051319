@@ -4,9 +4,10 @@ class CLI
   def initialize(user=nil)
     @user = user
   end
-
+	
+	#run method sets user & starts program flow
   def run
-    puts "Welcome to the Lyric Builder App!!!"
+    puts "Welcome to the Lyric Builder App!"
 		puts " "
     print "Are you a returning user? (y/n): "
     user_input
@@ -14,6 +15,7 @@ class CLI
     binding.pry
   end
 
+	#user_input method establishes new / returning user
   def user_input
     input = STDIN.gets.chomp.downcase
 
@@ -46,8 +48,6 @@ class CLI
         puts "Please use a different name."
       else
         @user = User.create(name: input)
-        #newuser = CLI.new(user)
-        #@user = newuser
         puts " "
         puts "Welcome, #{@user.name}!"
         loop_control = false
@@ -55,7 +55,29 @@ class CLI
     end
   end
 
-  def main_menu_print
+	#main_menu presents & controls program flow after user is set
+  def main_menu
+    choice = nil
+    loop_control = true
+
+    while loop_control
+      print_main_menu
+      input = STDIN.gets.chomp.to_i
+
+      case input
+        when 1
+          search
+        when 2
+          print_saved_songs
+        when 3
+          snippets_menu
+        when 4
+          loop_control = false
+      end
+    end
+  end
+
+  def print_main_menu
     puts " "
     puts "Main Menu"
     puts "---------"
@@ -67,27 +89,7 @@ class CLI
     print "Enter choice: "
   end
 
-  def main_menu
-    choice = nil
-    loop_control = true
-
-    while loop_control
-      main_menu_print
-      input = STDIN.gets.chomp.to_i
-
-      case input
-        when 1
-          search
-        when 2
-          saved_songs
-        when 3
-          snippet
-        when 4
-          loop_control = false
-      end
-    end
-  end
-
+	#search accesses the lyrics.ovh API & stores results if desired
   def search
   	loop_control = true
 
@@ -121,11 +123,13 @@ class CLI
 		if answer == "y"
 			new_song = Song.create(artist: artist, title: song, lyrics: lyrics_text)
       @user.songs << new_song
+      puts " "
       puts "Added to saved songs."
 		end
   end
 
-  def saved_songs
+	#print_saved_songs displays the user's saved songs
+  def print_saved_songs
 	  puts " "
     saved_songs = @user.songs
     saved_songs.each_with_index {|song, i|
@@ -139,6 +143,7 @@ class CLI
     saved_songs_menu
   end
 
+	#saved_songs_menu displays the menu for working with saved songs
   def saved_songs_menu
     puts "Saved Songs Menu"
     puts "----------------"
@@ -166,51 +171,64 @@ class CLI
     end
   end
 
-  #TODO
-  #Submenu
-  #-View Snippet
-    #Display all snippets
-  #-Create Snippet
-    #Choose song from the SOng History list
-    #User input = Choose Line number
-  #-Delete Snippet
-    #User input = Choose Line Number
-  #-Quit
-  def snippet_menu_display
-    puts "Snippet Menu"
-    puts "------------"
-    puts "1. View Snippet"
-    puts "2. Add to Snippet"
-    puts "3. Edit Snippet"
-    puts "4. Back"
+	#snippets_menu presents options for working with snippets & calls appropriate methods
+  def snippets_menu
+    loop_control = true
+      while loop_control
+
+        print_snippets_menu
+        input = STDIN.gets.chomp.to_i
+
+        case input
+        when 1
+          print_snippets
+        when 2
+          add_snippet
+        when 3
+          edit_snippets
+        when 4
+          loop_control = false
+        end
+      end
+  end
+
+  def print_snippets_menu
+	  puts " "
+    puts "Snippets Menu"
+    puts "-------------"
+    puts "1. View Snippets"
+    puts "2. Add Snippet"
+    puts "3. Edit Snippets"
+    puts "4. Back to Main Menu"
     puts " "
     print "Enter choice: "
   end
 
-  # def users_saved_search
-  #   listofsongs = @user.user.songs
-  #   listofsongs.each_with_index {|song, i|
-  #     puts "[#{i+1}] Artist: #{song.artist} - Title: #{song.title}"
-  #   }
-  # end
-  def pulled_songs
-    saved_songs = @user.songs
-    saved_songs.each_with_index {|song, i|
-    puts "[#{i+1}] #{song.title.gsub("%20", " ").titleize} by #{song.artist.gsub("%20", " ").titleize}"}
+  def print_snippets
+    puts " "
+    @user.snippets.map{|snippet|
+      puts snippet.lyric
+    }
+    puts " "
+    if @user.snippets.size == 0
+      puts "There are no snippets!"
+      puts " "
+      return
+    end
   end
 
-  def snippet_add
+  def add_snippet
 	  puts " "
-    puts "-----Saved Songs-----"
-    pulled_songs
+    puts "Saved Songs"
+    puts "-----------"
+    pull_songs
     puts " "
-    print "Enter number of song choice to display the lyrics: "
+    print "Enter song number to display the lyrics: "
     input = STDIN.gets.chomp.to_i
     puts " "
-    song_chosen = @user.songs[input-1].lyrics
-    song_id_saved = @user.songs[input-1].id
-    #binding.pry
-    lyric_array = song_chosen.split("\n").each_with_index{|line, i|
+    song = @user.songs[input-1].lyrics
+    song_id = @user.songs[input-1].id
+    lyric_array = song.split("\n").each_with_index{|line, i|
         if line != ""
             puts "[#{i+1}] #{line}"
         end
@@ -223,33 +241,22 @@ class CLI
     @user.snippets << new_snippet
     puts " "
     puts new_snippet.lyric
-    source = @user.songs.find_by(id: song_id_saved)
+    source = @user.songs.find_by(id: song_id)
     lyric_artist = source["artist"].gsub("%20", " ").titleize
     lyric_title = source["title"].gsub("%20", " ").titleize
-    puts "This lyric is from [#{lyric_title}] by [#{lyric_artist}]"
+    puts "(This lyric is from #{lyric_title} by #{lyric_artist})"
     puts " "
   end
 
-  def snippet_view
-    puts ""
-    @user.snippets.map{|l|
-      puts l.lyric
-    }
-    puts ""
-    if @user.snippets.size == 0
-      puts "There are no Snippets!!"
-      puts " "
-      return
-    end
-  end
 
-  def snippet_edit
-    puts ""
-    @user.snippets.each_with_index{|l, i|
-      puts "[#{i+1}] #{l.lyric}"
+  def edit_snippets
+    puts " "
+    @user.snippets.each_with_index{|snippet, i|
+      puts "[#{i+1}] #{snippet.lyric}"
     }
-    puts ""
-    snippet_edit_submenu
+    puts " "
+    print_snippets_submenu
+    puts " "
     print "Enter choice: "
     input = STDIN.gets.chomp.to_i
     case input
@@ -264,7 +271,7 @@ class CLI
         puts " "
       when 2
         puts " "
-        print "All songs removed from saved snippets."
+        print "All snippets removed from saved snippets."
         puts " "
         @user.snippets.destroy_all
       when 3
@@ -272,33 +279,16 @@ class CLI
       end
   end
 
-  def snippet_edit_submenu
-    #Optional: Move Snippet
+  def print_snippets_submenu
     puts "1. Remove snippet"
     puts "2. Clear all snippets"
-    puts "3. Back to Main Menu"
-    puts " "
+    puts "3. Back to Snippets Menu"
   end
 
-  def snippet
-    puts ""
-    puts "[-----#{@user.name}'s Snippet-----]"
-    loop_control = true
-      while loop_control
-
-        snippet_menu_display
-        snippet_menu_command = STDIN.gets.chomp.to_i
-
-        case snippet_menu_command
-        when 1
-          snippet_view
-        when 2
-          snippet_add
-        when 3
-          snippet_edit
-        when 4
-          loop_control = false
-        end
-      end
+	#pull_songs displays list of saved songs
+  def pull_songs
+    saved_songs = @user.songs
+    saved_songs.each_with_index {|song, i|
+    puts "[#{i+1}] #{song.title.gsub("%20", " ").titleize} by #{song.artist.gsub("%20", " ").titleize}"}
   end
 end
