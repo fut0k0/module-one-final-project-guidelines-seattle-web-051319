@@ -101,14 +101,26 @@ class CLI
 			song = song.gsub(" ", "%20")
 
 			search_result = nil
-			begin
-				status = Timeout::timeout(10){
-					search_result = RestClient.get("https://api.lyrics.ovh/v1/#{artist}/#{song}")}
-				loop_control = false
-			rescue Timeout::Error
-				puts "Taking too long..."
-			end
-		end
+
+      begin
+      status = Timeout::timeout(10){
+
+        print "Searching Song"
+        sleep(0.5)
+        print " ."
+        sleep(0.5)
+        print " ."
+        sleep(0.5)
+        print " ."
+
+        search_result = RestClient.get("https://api.lyrics.ovh/v1/#{artist}/#{song}")
+      }
+      loop_control = false
+      rescue Timeout::Error
+        puts "Took too long. . ."
+      end
+    end
+    puts " "
 
 		lyrics = JSON.parse(search_result)
 		lyrics_text = lyrics["lyrics"]
