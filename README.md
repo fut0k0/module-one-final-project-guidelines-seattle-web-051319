@@ -16,6 +16,7 @@ Once downloaded, use the "rake run" command to launch the program.
 ## Contributors
 
 Fabian Fabro (https://github.com/fihra/ )
+
 Christopher Cabell (https://github.com/fut0k0/)
 
 
