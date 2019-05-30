@@ -10,9 +10,8 @@ class CLI
 		puts " "
     print "Are you a returning user? (y/n): "
     user_input
-    display
+    main_menu
     binding.pry
-
   end
 
   def user_input
@@ -31,7 +30,7 @@ class CLI
     input = STDIN.gets.chomp
     @user = User.find_by(name: input)
     puts " "
-    puts "Hello #{@user.name}!"
+    puts "Hello, #{@user.name}!"
   end
 
   def new_user
@@ -56,7 +55,7 @@ class CLI
     end
   end
 
-  def main_menu
+  def main_menu_print
     puts " "
     puts "Main Menu"
     puts "---------"
@@ -68,19 +67,19 @@ class CLI
     print "Enter choice: "
   end
 
-  def display
+  def main_menu
     choice = nil
     loop_control = true
     
     while loop_control
-      main_menu
+      main_menu_print
       input = STDIN.gets.chomp.to_i
 
       case input
         when 1
           search
         when 2
-          history
+          saved_songs
         when 3
           puts "Snippeting"
         when 4
@@ -116,6 +115,7 @@ class CLI
 		lyrics_formatted = lyrics_text.split("\n")
 		lyrics_formatted.each_with_index {|line, i| puts "[#{i+1}] #{line}"}
 
+		puts " "
 		print "Would you like to save this song? (y/n): "
 		answer = STDIN.gets.strip.downcase
 		if answer == "y"
@@ -125,7 +125,7 @@ class CLI
 		end
   end
   
-  def history
+  def saved_songs
     saved_songs = @user.songs
     saved_songs.each_with_index {|song, i|
     puts "[#{i+1}] #{song.title.gsub("%20", " ").titleize} by #{song.artist.gsub("%20", " ").titleize}"}
@@ -134,11 +134,10 @@ class CLI
       puts "History is empty!"
       puts " "
     end
-    history_menu
-
+    saved_songs_menu
   end
 
-  def history_menu
+  def saved_songs_menu
     puts "1. Remove song"
     puts "2. Clear all songs"
     puts "3. Back to Main Menu"
