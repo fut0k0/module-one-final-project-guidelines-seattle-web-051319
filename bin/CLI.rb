@@ -81,7 +81,7 @@ class CLI
         when 2
           saved_songs
         when 3
-          puts "Snippeting"
+          snippet
         when 4
           loop_control = false
       end
@@ -131,7 +131,7 @@ class CLI
     puts "[#{i+1}] #{song.title.gsub("%20", " ").titleize} by #{song.artist.gsub("%20", " ").titleize}"}
     puts " "
     if saved_songs.size == 0
-      puts "History is empty!"
+      puts "There are no saved songs!"
       puts " "
       return
     end
@@ -162,4 +162,140 @@ class CLI
       when 3
     end
   end
+
+  #TODO
+  #Submenu
+  #-View Snippet
+    #Display all snippets
+  #-Create Snippet
+    #Choose song from the SOng History list
+    #User input = Choose Line number
+  #-Delete Snippet
+    #User input = Choose Line Number
+  #-Quit
+  def snippet_menu_display
+    puts "1. View Snippet"
+    puts "2. Add to Snippet"
+    puts "3. Edit Snippet"
+    puts "4. Back"
+    puts " "
+    print "Enter choice: "
+  end
+
+  # def users_saved_search
+  #   listofsongs = @user.user.songs
+  #   listofsongs.each_with_index {|song, i|
+  #     puts "[#{i+1}] Artist: #{song.artist} - Title: #{song.title}"
+  #   }
+  # end
+  def pulled_songs
+    saved_songs = @user.songs
+    saved_songs.each_with_index {|song, i|
+    puts "[#{i+1}] #{song.title.gsub("%20", " ").titleize} by #{song.artist.gsub("%20", " ").titleize}"}
+  end
+
+  def snippet_add
+    puts "----List of Saved Songs----"
+    pulled_songs
+    puts " "
+    print "Enter number of song choice to display the lyrics: "
+    input = STDIN.gets.chomp.to_i
+    song_chosen = @user.songs[input-1].lyrics
+    song_id_saved = @user.songs[input-1].id
+    #binding.pry
+    lyric_array = song_chosen.split("\n").each_with_index{|line, i|
+        if line != ""
+            puts "[#{i+1}] #{line}"
+        end
+    }
+    puts " "
+    print "Enter line number you would like to add to your snippet: "
+    lyric_line_number = STDIN.gets.chomp.to_i
+    lyric_line = lyric_array[lyric_line_number-1]
+    new_snippet = Snippet.create(lyric: lyric_line)
+    @user.snippets << new_snippet
+    puts " "
+    puts new_snippet.lyric
+    puts " "
+    #puts new_snippet
+    source = @user.songs.find_by(id: song_id_saved)
+    lyric_artist = source["artist"].gsub("%20", " ").titleize
+    lyric_title = source["title"].gsub("%20", " ").titleize
+    puts "This lyric is from [#{lyric_title}] by [#{lyric_artist}]"
+    puts " "
+  end
+
+  def snippet_view
+    puts ""
+    @user.snippets.map{|l|
+      puts l.lyric
+    }
+    puts ""
+    if @user.snippets.size == 0
+      puts "There are no Snippets!!"
+      puts " "
+      return
+    end
+  end
+
+  def snippet_edit
+    puts ""
+    @user.snippets.each_with_index{|l, i|
+      puts "[#{i+1}] #{l.lyric}"
+    }
+    puts ""
+    snippet_edit_submenu
+    print "Enter your choice: "
+    input = STDIN.gets.chomp.to_i
+    case input
+      when 1
+        puts " "
+        print "Choose snippet to remove: "
+        snippet = STDIN.gets.chomp.to_i
+        snippet_id = @user.snippets[snippet - 1].id
+        @user.snippets.destroy(snippet_id)
+        puts " "
+        puts "Removed from saved snippets."
+        puts " "
+      when 2
+        puts " "
+        print "All songs removed from saved snippets."
+        puts " "
+        @user.snippets.destroy_all
+      when 3
+
+      end
+  end
+
+  def snippet_edit_submenu
+    #Optional: Move Snippet
+    puts ""
+    puts "1. Remove snippet"
+    puts "2. Clear all snippets"
+    puts "3. Back to Main Menu"
+    puts " "
+  end
+
+  def snippet
+    puts ""
+    puts "[-----#{@user.name}'s Snippet-----]"
+    loop_control = true
+      while loop_control
+
+        snippet_menu_display
+        snippet_menu_command = STDIN.gets.chomp.to_i
+
+        case snippet_menu_command
+        when 1
+          snippet_view
+        when 2
+          snippet_add
+        when 3
+          snippet_edit
+        when 4
+          loop_control = false
+        end
+      end
+  end
+
 end
