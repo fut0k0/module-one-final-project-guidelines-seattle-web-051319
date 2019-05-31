@@ -12,6 +12,8 @@ Download the repository from GitHub: [Lyric Builder](https://github.com/fut0k0/m
 Once downloaded, use the "rake run" command in terminal to launch the program. Follow the onscreen prompts.
 
 
+
+
 ### Contributors
 
 Fabian Fabro, student at Flatiron School Seattle (https://github.com/fihra/)
