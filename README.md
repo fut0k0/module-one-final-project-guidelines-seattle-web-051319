@@ -14,6 +14,7 @@ Once downloaded, use the "rake run" command in terminal to launch the program. F
 
 
 
+
 ### Contributors
 
 Fabian Fabro, student at Flatiron School Seattle (https://github.com/fihra/)
