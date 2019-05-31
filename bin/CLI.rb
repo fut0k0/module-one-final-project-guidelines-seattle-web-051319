@@ -6,12 +6,14 @@ class CLI
   end
 
   def run
-    puts "Welcome to the Lyric Builder App!!!"
+    puts "[-------Welcome to the Lyrics Builder-------]"
 		puts " "
     print "Are you a returning user? (y/n): "
     user_input
     main_menu
-    binding.pry
+    puts " "
+    puts "[-----Thank you for using the Lyrics Builder!-----]"
+    puts " "
   end
 
   def user_input
