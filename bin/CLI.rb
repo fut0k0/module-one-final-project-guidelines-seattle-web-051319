@@ -101,22 +101,30 @@ class CLI
 			song = song.gsub(" ", "%20")
 
 			search_result = nil
+      def sleeping
+        sleep(0.7)
+      end
 
       begin
       status = Timeout::timeout(10){
 
         print "Searching Song"
-        sleep(0.5)
+        sleeping
         print " ."
-        sleep(0.5)
+        sleeping
         print " ."
-        sleep(0.5)
+        sleeping
+        print " ."
+        sleeping
+        print " ."
+        sleeping
         print " ."
 
         search_result = RestClient.get("https://api.lyrics.ovh/v1/#{artist}/#{song}")
       }
       loop_control = false
       rescue Timeout::Error
+        puts " "
         puts "Took too long. . ."
       end
     end
@@ -239,16 +247,22 @@ class CLI
 
   def snippet_view
     puts ""
-    @user.snippets.map{|l|
-      puts l.lyric
-    }
-    puts ""
     if @user.snippets.size == 0
       puts "There are no Snippets!!"
       puts " "
       return
+    else
+      puts ""
+      @user.snippets.map{|ly|
+        puts ly.lyric
+      }
+      @user.snippets.map{|l|
+          l.lyric.play("en", 1)
+      }
     end
+
   end
+
 
   def snippet_edit
     puts ""
